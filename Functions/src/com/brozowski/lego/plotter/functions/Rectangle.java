@@ -1,6 +1,6 @@
 package com.brozowski.lego.plotter.functions;
 
-public class Rectangle {
+public class Rectangle implements Plottable {
 
 	private PolarPlotter m_plotter;
 

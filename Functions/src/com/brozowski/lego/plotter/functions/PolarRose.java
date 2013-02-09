@@ -1,6 +1,6 @@
 package com.brozowski.lego.plotter.functions;
 
-public class PolarRose {
+public class PolarRose implements Plottable {
 	
 	public static final int TEN = 10;
 	

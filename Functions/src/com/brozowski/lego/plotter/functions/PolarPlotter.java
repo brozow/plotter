@@ -25,6 +25,8 @@ public interface PolarPlotter {
 	void penDown();
 	
 	void penUp();
+	
+	void moveTo(Point p);
 
 	void move(int rSteps, int thetaSteps);
 	

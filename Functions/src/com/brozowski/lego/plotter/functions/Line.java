@@ -1,6 +1,6 @@
 package com.brozowski.lego.plotter.functions;
 
-public class Line {
+public class Line implements Plottable {
 	
 	private PolarPlotter m_plotter;
 	private Point m_p1;
@@ -32,6 +32,8 @@ public class Line {
 		m_plotter.start();
 		
 		
+		m_plotter.moveTo(m_p1);
+
 		double start = m_p1.theta();
 		double end = m_p2.theta();
 		int direction = (end-start) < 0 ? -1 : 1; 
@@ -40,7 +42,8 @@ public class Line {
 		
 		double current = start;
 		double currentR = f(current);
-		m_plotter.move((int)(currentR/m_plotter.millimetersPerStep()), (int)(start/m_plotter.radiansPerStep()));
+		System.err.printf("Current: %f, R: %f\n", currentR, m_p1.r());
+//		m_plotter.move((int)(m_p1.r()/m_plotter.millimetersPerStep()), (int)(start/m_plotter.radiansPerStep()));
 		m_plotter.penDown();
 		while (direction*(end - current) > 0) {
 			current += step;

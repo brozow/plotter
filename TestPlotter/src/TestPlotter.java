@@ -1,3 +1,4 @@
+import com.brozowski.lego.plotter.functions.Point;
 import com.brozowski.lego.plotter.functions.PolarPlotter;
 
 public class TestPlotter implements PolarPlotter {
@@ -94,6 +95,13 @@ public class TestPlotter implements PolarPlotter {
 	@Override
 	public void finished() {
 		m_display.goToZero();
+	}
+
+
+	@Override
+	public void moveTo(Point p) {
+		m_rPosition = (int) (p.r()/millimetersPerStep());
+		m_thetaPosition = (int) (p.theta()/radiansPerStep());
 	}
 
 }

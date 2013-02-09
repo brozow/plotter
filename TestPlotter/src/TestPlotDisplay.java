@@ -155,7 +155,7 @@ public class TestPlotDisplay {
 		m_position= mm(r2);
 
 		synchronized (m_path) {
-			m_path.append(element, true);
+			m_path.append(element, false);
 		}
 		repaint();
 		sleep();
@@ -169,7 +169,7 @@ public class TestPlotDisplay {
 
 	private void sleep() {
 //		try {
-//			Thread.sleep(10);
+//			Thread.sleep(100);
 //		} catch (InterruptedException e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
@@ -194,7 +194,7 @@ public class TestPlotDisplay {
 		Shape element = new Arc2D.Double(x, y, width, height, -angle1+offset, extent, Arc2D.OPEN);
 		
 		synchronized (m_path) {
-			m_path.append(element, true);
+			m_path.append(element, false);
 		}
 
 		repaint();
