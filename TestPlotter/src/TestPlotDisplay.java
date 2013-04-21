@@ -40,8 +40,15 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -68,6 +75,9 @@ public class TestPlotDisplay {
 	private boolean m_followPen = false;
 	private Shape m_note;
 	private Path2D m_path = new Path2D.Double();
+	private BlockingQueue<Shape> m_elements = new LinkedBlockingQueue<Shape>();
+	private List<Shape> m_pathList = new ArrayList<Shape>();
+	private double m_scale = 1.0;
 	
 	public TestPlotDisplay() {
 		SwingUtilities.invokeLater(new Runnable() {
@@ -126,10 +136,20 @@ public class TestPlotDisplay {
 
 			private void paintPlot(Graphics2D g) {
 				g.setColor(Color.black);
-				
-				synchronized (m_path) {
-					g.draw(m_path);
+
+				int stepSize = Integer.MAX_VALUE;
+				int initial = m_pathList.size();
+				m_elements.drainTo(m_pathList, stepSize);
+								
+				for(Shape element : m_pathList) {
+					g.draw(element);
 				}
+
+				if (m_pathList.size() - initial == stepSize) {
+					repaint(50);
+				}
+					//g.draw(m_path);
+
 			}
 
 			private void paintNote(Graphics2D g) {
@@ -154,9 +174,8 @@ public class TestPlotDisplay {
 		m_rotation = theta;
 		m_position= mm(r2);
 
-		synchronized (m_path) {
-			m_path.append(element, false);
-		}
+		m_elements.offer(element);
+		
 		repaint();
 		sleep();
 	}
@@ -166,14 +185,18 @@ public class TestPlotDisplay {
 			m_panel.repaint(50);
 		}
 	}
-
+	
 	private void sleep() {
-//		try {
-//			Thread.sleep(100);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		sleep(1);
+	}
+
+	private void sleep(long millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Thread.yield();
 	}
 
@@ -193,10 +216,8 @@ public class TestPlotDisplay {
 		
 		Shape element = new Arc2D.Double(x, y, width, height, -angle1+offset, extent, Arc2D.OPEN);
 		
-		synchronized (m_path) {
-			m_path.append(element, false);
-		}
-
+		m_elements.offer(element);
+		
 		repaint();
 		sleep();
 	}
@@ -210,7 +231,7 @@ public class TestPlotDisplay {
 	}
 
 	private double scale() {
-		return 1;
+		return m_scale;
 	}
 
 	public void followPen() {
@@ -218,9 +239,29 @@ public class TestPlotDisplay {
 	} 
 	
 	public void goToZero() {
+		
+		double ROT_DECR = 0.01;
+		double POS_DECR = 0.75;
+
+		while(Math.abs(m_rotation) > ROT_DECR || Math.abs(m_position) > POS_DECR*scale()) {
+			double rotationDecr = ROT_DECR*Math.signum(m_rotation);
+			rotationDecr = Math.abs(rotationDecr) < Math.abs(m_rotation) ? rotationDecr : m_rotation;
+			m_rotation = m_rotation - rotationDecr;
+			double positionDecr = POS_DECR*scale()*Math.signum(m_position);
+			positionDecr = Math.abs(positionDecr) < Math.abs(m_position) ? positionDecr : m_position;
+			m_position = m_position - positionDecr;
+			repaint();
+			sleep(100);
+		}
+		
 		m_rotation = 0.0;
 		m_position = 0.0;
 		repaint();
+		sleep();
+	}
+
+	public void scale(double scale) {
+		m_scale = scale;
 	}
 
 }

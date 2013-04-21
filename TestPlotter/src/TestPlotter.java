@@ -14,8 +14,8 @@ public class TestPlotter implements PolarPlotter {
 	
 	private final TestPlotDisplay m_display;
 	
-	public TestPlotter(TestPlotDisplay display) {
-		m_display = display;
+	public TestPlotter() {
+		m_display = new TestPlotDisplay();
 	}
 	
 	
@@ -102,6 +102,16 @@ public class TestPlotter implements PolarPlotter {
 	public void moveTo(Point p) {
 		m_rPosition = (int) (p.r()/millimetersPerStep());
 		m_thetaPosition = (int) (p.theta()/radiansPerStep());
+	}
+
+
+	public void followPen() {
+		m_display.followPen();
+	}
+
+
+	public void scale(double scale) {
+		m_display.scale(scale);
 	}
 
 }

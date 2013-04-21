@@ -139,7 +139,7 @@ public class PolarRose implements Plottable {
 	}
 	
 	public void plot() {
-		plot(0.0, Math.PI*2);
+		plot(-Math.PI, Math.PI);
 	}
 
 	/**
